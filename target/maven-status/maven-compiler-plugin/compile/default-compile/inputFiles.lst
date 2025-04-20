@@ -1,0 +1,15 @@
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/gpio/GPIOManager.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/exceptions/RecognizerNotInitializedException.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/Person.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/Application.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/Main.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/Log.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/FaceRecognitionWindow.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/MessageType.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/Camera.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/exceptions/CameraNotInitializedException.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/WindowManager.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/Recognizer.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/gpio/IDevice.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/gpio/PWMDevice.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/ConsoleThread.java
