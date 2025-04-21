@@ -1,5 +1,6 @@
 /home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/gpio/GPIOManager.java
 /home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/exceptions/RecognizerNotInitializedException.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/gpio/DigitalOutputDevice.java
 /home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/Person.java
 /home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/Application.java
 /home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/Main.java
@@ -13,3 +14,4 @@
 /home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/gpio/IDevice.java
 /home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/gpio/PWMDevice.java
 /home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/ConsoleThread.java
+/home/tom/dev/FaceRecognition-maven/facerecognition/src/main/java/com/koubek/ScannerInput.java

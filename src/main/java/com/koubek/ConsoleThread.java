@@ -2,6 +2,10 @@ package com.koubek;
 
 import org.opencv.core.Mat;
 
+import com.koubek.gpio.DigitalOutputDevice;
+import com.koubek.gpio.GPIOManager;
+import com.koubek.gpio.PWMDevice;
+
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -109,21 +113,33 @@ public class ConsoleThread extends Thread {
     }
 
     private void addGpioDeviceProcedure() {
-        printToConsole("Choose GPIO device type:\n1) Digital output (LED)\n2) Pulse Width Modulation (Servo motor)");
-        int answer = Integer.parseInt(scanner.nextLine());
+        printToConsole("If you are using the provided servo motor barrier, please set all configuration values the same as default");
+        printToConsole("Choose GPIO device type:\n0) Cancel\n1) Digital output (LED light)\n2) Pulse Width Modulation (Servo motor)");
+        int answer = ScannerInput.GetInt(0, 2);
         switch (answer) {
+            case 0:
+                return;
             case 1:
-                addDODeviceProcedure();
+                printToConsole("Enter pin BCM number (please refer to the pin numbering diagram)");
+                int address = ScannerInput.GetInt();
+                GPIOManager.addDevice(new DigitalOutputDevice(address));
+                break;
+            case 2:
+                printToConsole("Enter PWM channel number (0 - BCM pin 12, 18; 1 - BCM pin 13, 19)");
+                int channel = ScannerInput.GetInt(0, 1);
+                printToConsole("Enter pulse frequency (Default: 50)");
+                int frequency = ScannerInput.GetInt();
+                printToConsole("Enter device duty cycle for enabled state (Percentual amount of time the signal will be on. Default: 8.2)");
+                double dutyCycleOn = ScannerInput.GetDouble();
+                printToConsole("Enter device duty cycle for disabled state (Default: 13.2)");
+                double dutyCycleOff = ScannerInput.GetDouble();
+                GPIOManager.addDevice(new PWMDevice(channel, frequency, dutyCycleOn, dutyCycleOff));
                 break;
         
             default:
                 printToConsole("Invalid");
                 break;
         }
-    }
-
-    private void addDODeviceProcedure() {
-
     }
 
     private void printToConsole(String message) {

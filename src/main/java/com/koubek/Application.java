@@ -122,7 +122,7 @@ public class Application {
         }
     }
 
-    /*private static void ServoMotorExample() {
+    /*private static void servoMotorExample() {
         PWMDevice device = new PWMDevice(0, 50);
         device.setState(true);
         try {

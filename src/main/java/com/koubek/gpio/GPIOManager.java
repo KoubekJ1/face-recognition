@@ -1,9 +1,11 @@
 package com.koubek.gpio;
 
+import java.io.NotActiveException;
 import java.util.LinkedList;
 
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
+import com.pi4j.exception.InitializeException;
 
 public abstract class GPIOManager {
     private static Context pi4j;
@@ -15,15 +17,18 @@ public abstract class GPIOManager {
     }
 
     public static void addDevice(IDevice device) {
+        if (pi4j == null) throw new RuntimeException("Pi4J has not been initialized!");
         devices.add(device);
     }
 
     public static Context getContext()
     {
+        if (pi4j == null) throw new RuntimeException("Pi4J has not been initialized!");
         return pi4j;
     }
 
     public static void setState(boolean newState) {
+        if (pi4j == null) throw new RuntimeException("Pi4J has not been initialized!");
         for (IDevice device : devices) {
             device.setState(newState);
         }
