@@ -1,33 +1,24 @@
 package com.koubek;
 
-import com.koubek.exceptions.CameraNotInitializedException;
-import com.koubek.exceptions.RecognizerNotInitializedException;
 import com.koubek.gpio.GPIOManager;
-import com.koubek.gpio.PWMDevice;
-
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfInt;
-import org.opencv.face.EigenFaceRecognizer;
-import org.opencv.face.FaceRecognizer;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.videoio.VideoCapture;
-import org.opencv.videoio.Videoio;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class Application {
     private static boolean debug;
     private static Camera camera;
 
+    private static int frameChangeCount = 5;
+    private static int disableDelay = 5;
+
     public static void start(String[] args) {
+        System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "ERROR");
         for (String arg : args) {
             switch (arg) {
                 case "debug" -> {
                     debug = true;
+                    System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
                     Log.printMessage("Debug mode enabled!", MessageType.INFO);
                 }
             }
@@ -42,8 +33,8 @@ public class Application {
 
     public static void shutdown() {
         if (camera != null) camera.shutdown();
-        System.exit(0);
         GPIOManager.shutdown();
+        System.exit(0);
     }
 
     public static boolean isDebug() {
@@ -57,7 +48,7 @@ public class Application {
 
     public static void createRecognizer() {
         if (camera == null)
-            throw new CameraNotInitializedException("Unable to create recognizer: Camera has not been initialized!");
+            throw new RuntimeException("Unable to create recognizer: Camera has not been initialized!");
         camera.createRecognizer();
     }
 
@@ -67,15 +58,15 @@ public class Application {
 
     public static void loadRecognizer(String path) throws IOException, ClassNotFoundException {
         if (camera == null)
-            throw new CameraNotInitializedException("Unable to load recognizer: Camera has not been initialized!");
+            throw new RuntimeException("Unable to load recognizer: Camera has not been initialized!");
         camera.loadRecognizer(path);
     }
 
     public static void saveRecognizer(String path) throws IOException {
         if (camera == null)
-            throw new CameraNotInitializedException("Unable to save recognizer: Camera has not been initialized!");
+            throw new RuntimeException("Unable to save recognizer: Camera has not been initialized!");
         if (camera.getRecognizer() == null)
-            throw new RecognizerNotInitializedException("Unable to save recognizer: Recognizer has not been initalized!");
+            throw new RuntimeException("Unable to save recognizer: Recognizer has not been initalized!");
         camera.getRecognizer().saveRecognizer(path);
     }
 
@@ -84,7 +75,15 @@ public class Application {
         thread.start();
     }
 
-    public static void faceRecognitionExample() {
+    public static int getFrameChangeCount() {
+        return frameChangeCount;
+    }
+
+    public static int getDisableDelay() {
+        return disableDelay;
+    }
+
+    /*public static void faceRecognitionExample() {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         // Images used for training the algorithm
         ArrayList<Mat> images = new ArrayList<>();
@@ -120,7 +119,7 @@ public class Application {
             long finishTime = System.currentTimeMillis();
             Log.printMessage("Face " + i + " recognized as person " + predictedLabel[0] + " in " + ((finishTime - startTime) / 1000.0) + "s; Confidence: " + confidence[0], MessageType.INFO);
         }
-    }
+    }*/
 
     /*private static void servoMotorExample() {
         PWMDevice device = new PWMDevice(0, 50);

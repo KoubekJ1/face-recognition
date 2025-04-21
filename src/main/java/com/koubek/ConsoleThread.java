@@ -19,7 +19,7 @@ public class ConsoleThread extends Thread {
     @Override
     public void run() {
         boolean running = true;
-        printToConsole("Face recognition project\nUse \"help\" to see all available commands");
+        printToConsole("Face recognition project. Jan Koubek 2025\nUse \"help\" to see all available commands");
         while (running) {
             System.out.print("command: ");
             String input = scanner.next();
@@ -116,13 +116,16 @@ public class ConsoleThread extends Thread {
         printToConsole("If you are using the provided servo motor barrier, please set all configuration values the same as default");
         printToConsole("Choose GPIO device type:\n0) Cancel\n1) Digital output (LED light)\n2) Pulse Width Modulation (Servo motor)");
         int answer = ScannerInput.GetInt(0, 2);
+        printToConsole("Is this device used for blinking when the state disable timer is active? (y/n)");
+        boolean blinkingDevice = scanner.next().equalsIgnoreCase("y");
         switch (answer) {
             case 0:
                 return;
             case 1:
                 printToConsole("Enter pin BCM number (please refer to the pin numbering diagram)");
                 int address = ScannerInput.GetInt();
-                GPIOManager.addDevice(new DigitalOutputDevice(address));
+                
+                GPIOManager.addDevice(new DigitalOutputDevice(address, blinkingDevice));
                 break;
             case 2:
                 printToConsole("Enter PWM channel number (0 - BCM pin 12, 18; 1 - BCM pin 13, 19)");
@@ -133,7 +136,7 @@ public class ConsoleThread extends Thread {
                 double dutyCycleOn = ScannerInput.GetDouble();
                 printToConsole("Enter device duty cycle for disabled state (Default: 13.2)");
                 double dutyCycleOff = ScannerInput.GetDouble();
-                GPIOManager.addDevice(new PWMDevice(channel, frequency, dutyCycleOn, dutyCycleOff));
+                GPIOManager.addDevice(new PWMDevice(channel, frequency, dutyCycleOn, dutyCycleOff, blinkingDevice));
                 break;
         
             default:

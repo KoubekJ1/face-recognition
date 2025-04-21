@@ -19,6 +19,7 @@ import java.util.LinkedList;
 public class Camera implements ActionListener {
     private VideoCapture videoCapture;
     private Timer captureTimer;
+    private Timer disableTimer;
     private Mat frame;
     private LinkedList<Mat> trackedFaceImages;
 
@@ -30,6 +31,10 @@ public class Camera implements ActionListener {
     private Mat loadedImage;
 
     private int absoluteFaceSize;
+
+    private boolean currentState = false;
+    private int currentTolerance = 0;
+    private float currentDisableDelay = 0;
 
     public Camera() {
         init(18, 0);
@@ -69,7 +74,6 @@ public class Camera implements ActionListener {
         long startTime = System.currentTimeMillis();
         Log.printMessage("Camera initializing...", MessageType.INIT);
         videoCapture = new VideoCapture(index, Videoio.CAP_V4L2);
-        // videoCapture = new VideoCapture(0);
         if (!videoCapture.isOpened()) {
             throw new RuntimeException("Unable to open video capture!");
         }
@@ -77,46 +81,11 @@ public class Camera implements ActionListener {
         smileCascade = loadClassifier("src/main/resources/haarcascades/haarcascade_smile.xml");
         captureTimer = new Timer(1000 / captureRate, this);
         captureTimer.start();
+        disableTimer = new Timer(Application.getDisableDelay() * 1000, this);
+        disableTimer.setRepeats(false);
         long finishTime = System.currentTimeMillis();
         Log.printMessage("Camera initialized in " + ((finishTime - startTime) / (double) 1000) + "s", MessageType.INIT);
     }
-
-    /*
-     * public BufferedImage getBufferedImage(Mat frame) {
-     * Mat grayFrame = new Mat();
-     * if (loadedImage != null) {
-     * frame = loadedImage.clone();
-     * }
-     * Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_BGR2GRAY);
-     * Imgproc.equalizeHist(grayFrame, grayFrame);
-     * if (this.absoluteFaceSize == 0) {
-     * int height = grayFrame.rows();
-     * if (Math.round(height * 0.2f) > 0) {
-     * this.absoluteFaceSize = Math.round(height * 0.2f);
-     * }
-     * }
-     * 
-     * MatOfRect faces = new MatOfRect();
-     * faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 |
-     * Objdetect.CASCADE_SCALE_IMAGE, new Size(absoluteFaceSize, absoluteFaceSize),
-     * new Size());
-     * Rect[] facesArray = faces.toArray();
-     * for (int i = 0; i < facesArray.length; i++) {
-     * Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new
-     * Scalar(0, 255, 0, 255), 3);
-     * }
-     * MatOfByte buffer = new MatOfByte();
-     * Imgcodecs.imencode(".png", frame, buffer);
-     * BufferedImage image = null;
-     * try {
-     * InputStream in = new ByteArrayInputStream(buffer.toArray());
-     * image = ImageIO.read(in);
-     * } catch (IOException e) {
-     * throw new RuntimeException(e);
-     * }
-     * return image;
-     * }
-     */
 
     private CascadeClassifier loadClassifier(String path) {
         CascadeClassifier cascade = new CascadeClassifier();
@@ -182,26 +151,6 @@ public class Camera implements ActionListener {
         return smileCount;
     }
 
-    /*
-     * private void loadClassifiers(String path) {
-     * faceCascade = new CascadeClassifier();
-     * File directory = new File(path);
-     * if (directory.listFiles().length == 0) {
-     * Log.printMessage("Invalid directory: " + path, MessageType.ERROR);
-     * return;
-     * }
-     * for (File classifier : directory.listFiles()) {
-     * if (!faceCascade.load(classifier.getPath())) {
-     * Log.printMessage("Unable to load XML classifier: " + classifier.getPath(),
-     * MessageType.ERROR);
-     * } else {
-     * Log.printMessage("Loaded XML classifier: " + classifier.getPath(),
-     * MessageType.INIT);
-     * }
-     * }
-     * }
-     */
-
     public void loadImage(String url) {
         loadedImage = Imgcodecs.imread(url);
     }
@@ -228,17 +177,32 @@ public class Camera implements ActionListener {
             boolean authorizedPersonDetected = false;
             for (Person person : recognizeFaces(frame)) {
                 if (person.isAuthorized()) {
-                    GPIOManager.setState(true);
                     authorizedPersonDetected = true;
+                    if (!currentState && currentTolerance < Application.getFrameChangeCount()) {
+                        currentTolerance++;
+                    } else {
+                        if (disableTimer.isRunning()) {
+                            disableTimer.stop();
+                            GPIOManager.setBlinkDevices(false);
+                        }
+                        GPIOManager.setState(true);
+                        currentState = true;
+                        currentTolerance = 0;
+                    }
                     break;
                 }
             }
             if (!authorizedPersonDetected) {
-                GPIOManager.setState(false);
+                if (currentState && currentTolerance < Application.getFrameChangeCount()) {
+                    currentTolerance++;
+                } else {
+                    disableTimer.start();
+                    if (currentState) GPIOManager.setBlinkDevices(true);
+                    currentState = false;
+                    currentTolerance = 0;
+                }
             }
-            //Log.printMessage("Smile count: " + getSmileCount(frame), MessageType.INIT);
 
-            // WindowManager.getWindow().drawBufferedImage(this.getBufferedImage(frame));
             if (trackedFaceImages != null) {
                 Rect[] detectedFaces = detectFaces(frame);
                 if (detectedFaces.length != 1)
@@ -249,6 +213,11 @@ public class Camera implements ActionListener {
                 if (trackedFaceImages != null)
                     trackedFaceImages.add(grayFrame.submat(detectedFaces[0]));
             }
+        }
+
+        if (e.getSource() == disableTimer) {
+            GPIOManager.setBlinkDevices(false);
+            GPIOManager.setState(false);
         }
     }
 }
