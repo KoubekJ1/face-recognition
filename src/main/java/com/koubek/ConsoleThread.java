@@ -5,6 +5,7 @@ import org.opencv.core.Mat;
 import com.koubek.gpio.DigitalOutputDevice;
 import com.koubek.gpio.GPIOManager;
 import com.koubek.gpio.PWMDevice;
+import com.koubek.window.WindowManager;
 
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -35,6 +36,10 @@ public class ConsoleThread extends Thread {
                     case "addgpio":
                     case "ag":
                         addGpioDeviceProcedure();
+                        break;
+                    case "openwindow":
+                    case "ow":
+                        WindowManager.getWindow().setVisible(true);
                         break;
                     case "faces":
                     case "f":
@@ -101,6 +106,7 @@ public class ConsoleThread extends Thread {
         printToConsole("Available commands:" +
                 "\nhelp" +
                 "\naddgpio | ag" +
+                "\nopenwindow | ow" +
                 "\ninitcamera | ic" +
                 "\ncreaterecognizer | cr" +
                 "\nloadrecognizer | lr" +

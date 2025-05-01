@@ -9,11 +9,16 @@ import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 
 import com.koubek.gpio.GPIOManager;
+import com.koubek.window.WindowManager;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 
 public class Camera implements ActionListener {
@@ -21,6 +26,7 @@ public class Camera implements ActionListener {
     private Timer captureTimer;
     private Timer disableTimer;
     private Mat frame;
+    private Rect[] faces, smiles;
     private LinkedList<Mat> trackedFaceImages;
 
     private CascadeClassifier faceCascade;
@@ -151,6 +157,21 @@ public class Camera implements ActionListener {
         return smileCount;
     }
 
+    public BufferedImage convertMatToBufferedImage(Mat frame) {
+        Mat bawFrame = new Mat();
+        Imgproc.cvtColor(frame, bawFrame, Imgproc.COLOR_BGR2GRAY); 
+        MatOfByte buffer = new MatOfByte();
+        Imgcodecs.imencode(".png", bawFrame, buffer);
+        BufferedImage image = null;
+        try {
+            InputStream in = new ByteArrayInputStream(buffer.toArray());
+            image = ImageIO.read(in);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return image;   
+    }
+
     public void loadImage(String url) {
         loadedImage = Imgcodecs.imread(url);
     }
@@ -170,9 +191,13 @@ public class Camera implements ActionListener {
             if (frame == null)
                 frame = new Mat();
             videoCapture.read(frame);
+            faces = null;
+            smiles = null;
 
             if (frame.empty()) return;
             if (recognizer == null) return;
+
+            if (WindowManager.isWindowVisible()) WindowManager.getWindow().setImage(convertMatToBufferedImage(frame));
 
             boolean authorizedPersonDetected = false;
             for (Person person : recognizeFaces(frame)) {
