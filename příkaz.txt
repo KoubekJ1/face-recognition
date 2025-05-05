@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=/home/.../src/main/resources/opencv.jar -DgroupId=org -DartifactId=opencv -Dversion=4.1.1 -Dpackaging=jar
