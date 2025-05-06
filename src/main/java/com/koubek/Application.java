@@ -4,6 +4,7 @@ import com.koubek.gpio.GPIOManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 public class Application {
     private static boolean debug;
@@ -26,7 +27,7 @@ public class Application {
         }
         GPIOManager.init();
 
-        File lib = new File("src/main/resources/opencv/libopencv_java4110.so");
+        File lib = new File("libopencv_java4110.so");
         System.load(lib.getAbsolutePath());
         
         runConsole();
