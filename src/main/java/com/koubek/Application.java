@@ -27,7 +27,7 @@ public class Application {
         }
         GPIOManager.init();
 
-        File lib = new File("libopencv_java4110.so");
+        File lib = new File("opencv/libopencv_java4110.so");
         System.load(lib.getAbsolutePath());
         
         runConsole();

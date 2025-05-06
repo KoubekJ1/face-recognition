@@ -88,8 +88,8 @@ public class Camera implements ActionListener {
         }
         videoCapture.set(3, 1920);
         videoCapture.set(4, 1080);
-        faceCascade = loadClassifier("src/main/resources/haarcascades/haarcascade_frontalface_default.xml");
-        smileCascade = loadClassifier("src/main/resources/haarcascades/haarcascade_smile.xml");
+        faceCascade = loadClassifier("opencv/haarcascades/haarcascade_frontalface_default.xml");
+        smileCascade = loadClassifier("opencv/haarcascades/haarcascade_smile.xml");
         captureTimer = new Timer(1000 / captureRate, this);
         captureTimer.start();
         disableTimer = new Timer(Application.getDisableDelay() * 1000, this);

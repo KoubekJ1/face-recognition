@@ -159,7 +159,7 @@ public class ConsoleThread extends Thread {
     private void changeSettingsProcedure() {
         printToConsole("Which setting do you wish to change?");
         printToConsole("1) Cancel\n2) Verification frame count\n3) Output disable delay\n4) Max confidence value");
-        switch (ScannerInput.GetInt(1, 3)) {
+        switch (ScannerInput.GetInt(1, 4)) {
             case 1:
                 break;
             case 2:
