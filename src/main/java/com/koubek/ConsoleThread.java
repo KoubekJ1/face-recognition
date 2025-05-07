@@ -10,13 +10,22 @@ import com.koubek.window.WindowManager;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+/**
+ * Console thread instances are threads that display the command line interface on the program instance's command line and allow the user to provide input
+ */
 public class ConsoleThread extends Thread {
     Scanner scanner;
 
+    /**
+     * Constructs a new console thread
+     */
     public ConsoleThread() {
         scanner = new Scanner(System.in);
     }
 
+    /**
+     * Runs the command line interface on its own thread
+     */
     @Override
     public void run() {
         boolean running = true;
@@ -106,6 +115,9 @@ public class ConsoleThread extends Thread {
         }
     }
 
+    /**
+     * Prints all available commands to the console
+     */
     private void help() {
         printToConsole("Available commands:" +
                 "\nhelp" +
@@ -123,6 +135,9 @@ public class ConsoleThread extends Thread {
                 "\nexit");
     }
 
+    /**
+     * Starts the user-reliant procedure to add a GPIO device, where the user configures his GPIO device
+     */
     private void addGpioDeviceProcedure() {
         printToConsole("If you are using the provided servo motor barrier, please set all configuration values the same as default");
         printToConsole("Choose GPIO device type:\n0) Cancel\n1) Digital output (LED light)\n2) Pulse Width Modulation (Servo motor)");
@@ -156,6 +171,9 @@ public class ConsoleThread extends Thread {
         }
     }
 
+    /**
+     * Starts the user-reliant procedure to change certain settings regarding recognition
+     */
     private void changeSettingsProcedure() {
         printToConsole("Which setting do you wish to change?");
         printToConsole("1) Cancel\n2) Verification frame count\n3) Output disable delay\n4) Max confidence value");
@@ -179,6 +197,10 @@ public class ConsoleThread extends Thread {
         }
     }
 
+    /**
+     * Prints the given message to the console
+     * @param message message
+     */
     private void printToConsole(String message) {
         System.out.println(message);
     }

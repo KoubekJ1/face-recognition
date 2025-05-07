@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 
+/**
+ * Camera objects serve as software representations of hardware cameras, which have assigned recognizer objects.
+ */
 public class Camera implements ActionListener {
     private VideoCapture videoCapture;
     private Timer captureTimer;
@@ -45,40 +48,76 @@ public class Camera implements ActionListener {
 
     private final Object timerLock = new Object();
 
+    /**
+     * Creates a new camera with the camera index 0
+     */
     public Camera() {
         init(5, 0);
     }
 
+    /**
+     * Creates a new camera with the given camera index
+     * @param index camera index
+     */
     public Camera(int index) {
         init(5, index);
     }
 
+    /**
+     * Creates a new recognizer object to be used by the camera
+     */
     public void createRecognizer() {
         recognizer = new Recognizer();
     }
 
+    /**
+     * Loads a recognizer object from the given relative path
+     * @param path the path of the recognizer's directory
+     * @throws IOException in case the recognizer could not be loaded
+     * @throws ClassNotFoundException in case the class could not be found
+     */
     public void loadRecognizer(String path) throws IOException, ClassNotFoundException {
         recognizer = Recognizer.loadRecognizer(path);
     }
 
+    /**
+     * Returns the recognizer used by the camera
+     * @return recognizer
+     */
     public Recognizer getRecognizer() {
         return recognizer;
     }
 
+    /**
+     * Returns the camera's current unaltered frame
+     * @return current frame
+     */
     public Mat getCurrentFrame() {
         return frame;
     }
 
+    /**
+     * Enables saving images of a person to then be able to recognize
+     */
     public void trackFace() {
         trackedFaceImages = new LinkedList<>();
     }
 
+    /**
+     * Returns the saved images of the tracked person and deletes them
+     * @return the saved images
+     */
     public LinkedList<Mat> finishTracking() {
         LinkedList<Mat> matList = trackedFaceImages;
         trackedFaceImages = null;
         return matList;
     }
 
+    /**
+     * Initializes the camera with the given capture rate and index
+     * @param captureRate camera capture rate
+     * @param index camera index
+     */
     private void init(int captureRate, int index) {
         long startTime = System.currentTimeMillis();
         Log.printMessage("Camera initializing...", MessageType.INIT);
@@ -98,6 +137,11 @@ public class Camera implements ActionListener {
         Log.printMessage("Camera initialized in " + ((finishTime - startTime) / (double) 1000) + "s", MessageType.INIT);
     }
 
+    /**
+     * Loads and returns a cascade classifier from an XML file in the given relative path
+     * @param path relative path to XML file
+     * @return cascade classifier
+     */
     private CascadeClassifier loadClassifier(String path) {
         CascadeClassifier cascade = new CascadeClassifier();
         cascade.load(path);
@@ -105,6 +149,11 @@ public class Camera implements ActionListener {
         return cascade;
     }
 
+    /**
+     * Detects and returns parts of the given image containing faces
+     * @param image image to be analysed
+     * @return rectangles with faces
+     */
     private Rect[] detectFaces(Mat image) {
         Mat grayFrame = new Mat();
         if (loadedImage != null) {
@@ -125,6 +174,11 @@ public class Camera implements ActionListener {
         return faces.toArray();
     }
 
+    /**
+     * Recognizes the faces in the image using the camera's recognizer
+     * @param image image to be analyzed
+     * @return detection objects for each indiviual detected face
+     */
     public Detection[] recognizeFaces(Mat image) {
         if (image == null) return null;
         if (image.empty()) return null;
@@ -148,6 +202,11 @@ public class Camera implements ActionListener {
         return people;
     }
 
+    /**
+     * Detects and returns parts of the given image containing smiles
+     * @param image image to be analyzed
+     * @return smiles
+     */
     public Rect[] detectSmiles(Mat image) {
         LinkedList<Rect> rectangles = new LinkedList<>();
         if (faces == null) faces = detectFaces(image);
@@ -168,6 +227,11 @@ public class Camera implements ActionListener {
         return rectangles.toArray(rectArray);
     }
 
+    /**
+     * Returns how many smiles are present in the given image
+     * @param image image to be analyzed
+     * @return smile count
+     */
     public int getSmileCount(Mat image) {
         int smileCount = 0;
         Rect[] faces = detectFaces(image);
@@ -182,6 +246,10 @@ public class Camera implements ActionListener {
         return smileCount;
     }
 
+    /**
+     * Returns a buffered image object containing the camera's current frame with highlighted faces with names and confidence values, as well as highlighted smiles
+     * @return buffered image of the camera's altered current frame
+     */
     public BufferedImage getBufferedImage() {
         if (faces == null) faces = detectFaces(frame);
         if (smiles == null) smiles = detectSmiles(frame);
@@ -214,19 +282,32 @@ public class Camera implements ActionListener {
         return image;   
     }
 
+    /**
+     * Loads the given image to the camera
+     * @param url path to the image
+     */
     public void loadImage(String url) {
         loadedImage = Imgcodecs.imread(url);
     }
 
+    /**
+     * Unloads the previously loaded image
+     */
     public void unloadImage() {
         loadedImage = null;
     }
 
+    /**
+     * Shuts the camera down, stopping the frame capture and face recognition cycle
+     */
     public void shutdown() {
         captureTimer.stop();
         videoCapture.release();
     }
 
+    /**
+     * Triggered by the camera capture timer. This method serves as the camera frame capture and face recognition cycle
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         synchronized (timerLock) {

@@ -5,6 +5,10 @@ import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * The log class contains a method used for abstracting log output for means of alteration.
+ * Depending on the terminal emulator's capabilities, the log output may also have a special color based on the message type.
+ */
 public class Log {
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_BLACK = "\u001B[30m";
@@ -19,6 +23,13 @@ public class Log {
     private static boolean printLog = true;
     private static boolean printInitializationDialog = false;
 
+    /**
+     * Prints the message to the console along with the type and date.
+     * All message types have a different output color.
+     * INIT type messages are only displayed when the program is in debug mode.
+     * @param message Message to be displayed
+     * @param type type of the message
+     */
     public static void printMessage(String message, MessageType type) {
         printInitializationDialog = Application.isDebug();
         if (!printLog) return;

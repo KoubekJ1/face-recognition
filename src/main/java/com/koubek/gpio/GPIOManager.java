@@ -9,12 +9,18 @@ import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 import com.pi4j.exception.InitializeException;
 
+/**
+ * GPIO manager serves as a way to statically manage all GPIO devices
+ */
 public abstract class GPIOManager {
     private static Context pi4j;
     private static LinkedList<IDevice> devices = new LinkedList<>();
     private static Timer blinkingTimer;
     private static boolean currentState;
 
+    /**
+     * Initializes the GPIO manager
+     */
     public static void init() {
         pi4j = Pi4J.newAutoContext();
         System.out.println();
@@ -25,17 +31,29 @@ public abstract class GPIOManager {
         } );
     }
 
+    /**
+     * Adds a new GPIO device to the manager.
+     * @param device GPIO device
+     */
     public static void addDevice(IDevice device) {
         if (pi4j == null) throw new RuntimeException("Pi4J has not been initialized!");
         devices.add(device);
     }
 
+    /**
+     * Returns the static Pi4J context
+     * @return Pi4J
+     */
     public static Context getContext()
     {
         if (pi4j == null) throw new RuntimeException("Pi4J has not been initialized!");
         return pi4j;
     }
 
+    /**
+     * Sets the state of all added GPIO devices
+     * @param newState the new state
+     */
     public static void setState(boolean newState) {
         if (pi4j == null) throw new RuntimeException("Pi4J has not been initialized!");
         currentState = newState;
@@ -44,6 +62,10 @@ public abstract class GPIOManager {
         }
     }
 
+    /**
+     * Sets whether signaling devices should be signaling
+     * @param signal
+     */
     public static void setBlinkDevices(boolean signal) {
         if (signal) {
              blinkingTimer.start();
@@ -55,6 +77,9 @@ public abstract class GPIOManager {
         }
     }
 
+    /**
+     * Shuts down the GPIO manager
+     */
     public static void shutdown() {
         if (pi4j != null) {
             setState(false);

@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+/**
+ * Recognizer instances are used to recognize faces from image input.
+ * Recognizers first have to be trained, only then can they recognize faces.
+ */
 public class Recognizer {
     private LBPHFaceRecognizer lbph;
     private ArrayList<Person> people;
@@ -19,12 +23,22 @@ public class Recognizer {
 
     public static final Detection UNRECOGNIZED = new Detection(new Person("Unrecognized", false), 0);
 
+    /**
+     * Constructs a new recognizer instance.
+     */
     public Recognizer() {
         lbph = LBPHFaceRecognizer.create();
         people = new ArrayList<>();
         trained = false;
     }
 
+    /**
+     * Loads a recognizer from the given recognizer directory's relative path
+     * @param path the given recognizer directory's relative path
+     * @return The loaded recognizer
+     * @throws IOException in case the recognizer could not be loaded
+     * @throws ClassNotFoundException in case the class was not found
+     */
     public static Recognizer loadRecognizer(String path) throws IOException, ClassNotFoundException {
         Recognizer recognizer = new Recognizer();
         recognizer.trained = true;
@@ -43,6 +57,12 @@ public class Recognizer {
         return recognizer;
     }
 
+    /**
+     * Saves the recognizer to the given relative path
+     * Saving a recognizer directory automatically creates any potential directories that may not already exist
+     * @param path the relative path of the recognizer's directory
+     * @throws IOException in case the recognizer could not be saved
+     */
     public void saveRecognizer(String path) throws IOException {
         new File(path).mkdirs();
         lbph.save(path + "/lbph.xml");
@@ -51,6 +71,12 @@ public class Recognizer {
         objectOutputStream.writeObject(people);
     }
 
+    /**
+     * Adds a new person to the recognizer who can then be recognized.
+     * For optimal results, the images should be cropped to the face.
+     * @param images the images of the person
+     * @param person the person in the images
+     */
     public void addPerson(LinkedList<Mat> images, Person person)
     {
         synchronized (recognizerLock) {
@@ -72,6 +98,12 @@ public class Recognizer {
         }
     }
 
+    /**
+     * Recognizes a single face from the given image.
+     * For optimal results, the image should be cropped to the face.
+     * @param face
+     * @return
+     */
     public Detection recognizeFace(Mat face)
     {
         synchronized (recognizerLock) {
@@ -86,6 +118,10 @@ public class Recognizer {
         }
     }
 
+    /**
+     * Returns whether the recognizer is in the process of adding a person
+     * @return is saving person
+     */
     public boolean isSavingPerson() {
         return savingPerson;
     }
